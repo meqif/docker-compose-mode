@@ -35,7 +35,7 @@
 (defun company-docker-compose--prefix ()
   "Get a prefix from the current position."
   (and (string-match-p "^docker-compose.*\.yml$" (buffer-name))
-       (company-grab-symbol)))
+       (company-grab-line "^[\t ]+\\([a-zA-Z]+\\)" 1)))
 
 (defun company-docker-compose--post-completion ()
   "Execute actions after completing with candidate."
