@@ -6,7 +6,7 @@
 ;; URL: https://github.com/meqif/docker-compose-mode
 ;; Version: 0.1.0
 ;; Keywords: convenience
-;; Package-Requires: ((emacs "24.3") (dash "2.12.0") (cl-lib "0.5.0"))
+;; Package-Requires: ((emacs "24.3") (dash "2.12.0"))
 
 ;; Licensed under the Apache License, Version 2.0 (the "License");
 ;; you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@
 ;;; Code:
 
 (require 'dash)
-(require 'cl-lib)
 
 (defgroup docker-compose nil
   "Major mode for editing docker-compose files."
@@ -61,9 +60,7 @@ variable for additional information about STRING and STATUS."
 
 (defun docker-compose--candidates (prefix)
   "Obtain applicable candidates from the keywords list for the PREFIX."
-  (cl-remove-if-not
-   (lambda (candidate) (string-prefix-p prefix candidate))
-   docker-compose-keywords))
+  (--filter (string-prefix-p prefix it) docker-compose-keywords))
 
 (defun docker-compose--prefix ()
   "Get a prefix and its starting and ending points from the current position."
