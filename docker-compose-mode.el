@@ -71,12 +71,11 @@ variable for additional information about STRING and STATUS."
 
 (defun docker-compose--keyword-complete-at-point ()
   "`completion-at-point-functions' function for docker-compose keywords."
-  (-let (((prefix start end) (docker-compose--prefix)))
-    (when start
-      (list start end (docker-compose--candidates prefix)
-            :exclusive 'yes
-            :company-docsig #'identity
-            :exit-function #'docker-compose--post-completion))))
+  (-when-let* (((prefix start end) (docker-compose--prefix)))
+    (list start end (docker-compose--candidates prefix)
+          :exclusive 'yes
+          :company-docsig #'identity
+          :exit-function #'docker-compose--post-completion)))
 
 ;;;###autoload
 (define-derived-mode docker-compose-mode yaml-mode "docker-compose"
