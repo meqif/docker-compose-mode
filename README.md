@@ -1,7 +1,11 @@
-# company-docker-compose
+# docker-compose-mode
 
-Company-mode backend for docker-compose files, providing completion of
-docker-compose keys.
+Major mode for editing docker-compose files, providing completion of
+docker-compose keys through `completion-at-point-functions`.
+
+The completions can be used with the completion system shipped with vanilla
+Emacs, and 3rd-party frontends like company-mode, autocomplete, and
+ido-at-point.
 
 ## Installation
 
@@ -13,23 +17,17 @@ to save the `.el` files in your Emacs' load path.
 Manually:
 
 ``` emacs-lisp
-(require 'company-docker-compose)
-
-(with-eval-after-load 'company
-  (add-to-list 'company-backends 'company-docker-compose))
+(require 'docker-compose-mode)
 ```
 
 Alternatively, if you're using `use-package`:
 
 ``` emacs-lisp
-(use-package company-docker-compose
-  :after company
-  :config
-  (add-to-list 'company-backends 'company-docker-compose))
+(use-package docker-compose-mode)
 ```
 
 ## Customization
 
-By default, company-docker-compose suggests docker-compose 3.3 keywords for completion.
+By default, the keyword completion function suggests docker-compose 3.3 keywords.
 
-You can change the keyword candidates offered by this backend by customizing `company-docker-compose-keywords`.
+You can change the candidates offered by the backend by customizing `docker-compose-keywords`.

@@ -1,12 +1,12 @@
-;;; company-docker-compose.el --- company-mode backend for docker-compose files -*- lexical-binding: t; -*-
+;;; docker-compose-mode.el --- major mode for editing docker-compose files -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2017  Ricardo Martins
 
 ;; Author: Ricardo Martins
-;; URL: https://github.com/meqif/company-docker-compose
+;; URL: https://github.com/meqif/docker-compose-mode
 ;; Version: 0.1.0
 ;; Keywords: convenience
-;; Package-Requires: ((emacs "24") (company "0.8.0") (cl-lib "0.5.0"))
+;; Package-Requires: ((emacs "24.3") (dash "2.12.0") (cl-lib "0.5.0"))
 
 ;; Licensed under the Apache License, Version 2.0 (the "License");
 ;; you may not use this file except in compliance with the License.
@@ -26,15 +26,15 @@
 
 ;;; Code:
 
-(require 'company)
+(require 'dash)
 (require 'cl-lib)
 
-(defgroup company-docker-compose nil
-  "Company mode backend for docker-compose files."
-  :group 'company
-  :prefix "company-docker-compose-")
+(defgroup docker-compose nil
+  "Major mode for editing docker-compose files."
+  :group 'languages
+  :prefix "docker-compose-")
 
-(defcustom company-docker-compose-keywords
+(defcustom docker-compose-keywords
   '("aliases" "args" "bridge" "build" "cache_from" "cap_add" "cap_drop"
     "cgroup_parent" "command" "configs" "container_name" "context"
     "credential_spec" "depends_on" "deploy" "devices" "dns" "dns_search"
@@ -50,33 +50,46 @@
     "volumes" "working_dir")
   "List of docker-compose keywords."
   :type '(repeat string)
-  :group 'company-docker-compose)
+  :group 'docker-compose)
 
-(defun company-docker-compose--prefix ()
-  "Get a prefix from the current position."
-  (and (string-match-p "^docker-compose.*\.yml$" (buffer-name))
-       (company-grab-line "^[\t ]+\\([a-zA-Z]+\\)" 1)))
+(defun docker-compose--post-completion (_string status)
+  "Execute actions after completing with candidate.
+Read the documentation for the `completion-extra-properties'
+variable for additional information about STRING and STATUS."
+  (when (eq status 'finished)
+    (insert ": ")))
 
-(defun company-docker-compose--post-completion ()
-  "Execute actions after completing with candidate."
-  (insert ": "))
-
-(defun company-docker-compose--candidates (prefix)
+(defun docker-compose--candidates (prefix)
   "Obtain applicable candidates from the keywords list for the PREFIX."
   (cl-remove-if-not
    (lambda (candidate) (string-prefix-p prefix candidate))
-   company-docker-compose-keywords))
+   docker-compose-keywords))
+
+(defun docker-compose--prefix ()
+  "Get a prefix and its starting and ending points from the current position."
+  (save-excursion
+    (beginning-of-line)
+    (when (looking-at "^[\t ]+\\([a-zA-Z][a-zA-Z0-9_]+\\)$")
+      (list (match-string-no-properties 1) (match-beginning 1) (match-end 1)))))
+
+(defun docker-compose--keyword-complete-at-point ()
+  "`completion-at-point-functions' function for docker-compose keywords."
+  (-let (((prefix start end) (docker-compose--prefix)))
+    (when start
+      (list start end (docker-compose--candidates prefix)
+            :exclusive 'yes
+            :company-docsig #'identity
+            :exit-function #'docker-compose--post-completion))))
 
 ;;;###autoload
-(defun company-docker-compose (command &optional arg &rest ignored)
-  "Company-mode completion backend for docker-compose files.
-See `company-backends' for more info about COMMAND, ARG, and IGNORED."
-  (interactive (list 'interactive))
-  (cl-case command
-    (interactive (company-begin-backend 'company-docker-compose))
-    (prefix (company-docker-compose--prefix))
-    (candidates (company-docker-compose--candidates arg))
-    (post-completion (company-docker-compose--post-completion))))
+(define-derived-mode docker-compose-mode yaml-mode "docker-compose"
+  "Major mode to edit docker-compose files."
+  (setq-local completion-at-point-functions
+              '(docker-compose--keyword-complete-at-point)))
 
-(provide 'company-docker-compose)
-;;; company-docker-compose.el ends here
+;;;###autoload
+(add-to-list 'auto-mode-alist
+             '("docker-compose.*\.yml\\'" . docker-compose-mode))
+
+(provide 'docker-compose-mode)
+;;; docker-compose-mode.el ends here
