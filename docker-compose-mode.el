@@ -39,6 +39,22 @@
   :type '(repeat string)
   :group 'docker-compose)
 
+(defun docker-compose--find-version ()
+  "Find the version of the docker-compose file.
+It is assumed that files lacking an explicit 'version' key are
+version 1."
+  (save-excursion
+    (goto-char (point-min))
+    (if (looking-at "^version:\s*[\\'\"]?\\([2-9]\\(?:\.[0-9]\\)?\\)[\\'\"]?$")
+        (match-string-no-properties 1)
+      "1.0")))
+
+(defun docker-compose--normalize-version (version)
+  "Normalize VERSION to conform to <major>.<minor>."
+  (if (string-match-p "^[0-9]$" version)
+      (concat version ".0")
+    version))
+
 (defun docker-compose--post-completion (_string status)
   "Execute actions after completing with candidate.
 Read the documentation for the `completion-extra-properties'

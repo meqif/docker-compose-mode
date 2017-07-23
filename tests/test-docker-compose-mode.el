@@ -44,5 +44,36 @@
             (expected-candidates '("env_file" "environment")))
         (expect (docker-compose--candidates "en") :to-equal expected-candidates)))))
 
+(describe "Function: `docker-compose--find-version'"
+  (describe "when the version is not specified"
+    (it "returns \"1.0\""
+      (with-temp-buffer
+        (insert "services:\n  foo:\n    build: .\n")
+        (expect (docker-compose--find-version) :to-equal "1.0"))))
+
+  (describe "when the version is not surrounded by any quotes"
+    (it "returns the version specified by the `version' key"
+      (with-temp-buffer
+        (insert "version: 2\nservices:\n  foo:\n    build: .\n")
+        (expect (docker-compose--find-version) :to-equal "2"))))
+
+  (describe "when the version is surrounded by single quotes"
+    (it "returns the version specified by the `version' key"
+      (with-temp-buffer
+        (insert "version: '2'\nservices:\n  foo:\n    build: .\n")
+        (expect (docker-compose--find-version) :to-equal "2"))))
+
+  (describe "when the version is surrounded by double quotes"
+    (it "returns the version specified by the `version' key"
+      (with-temp-buffer
+        (insert "version: \"2\"\nservices:\n  foo:\n    build: .\n")
+        (expect (docker-compose--find-version) :to-equal "2"))))
+
+  (describe "when the version contains a major and a minor part"
+    (it "returns the major and the minor"
+      (with-temp-buffer
+        (insert "version: \"3.3\"\nservices:\n  foo:\n    build: .\n")
+        (expect (docker-compose--find-version) :to-equal "3.3")))))
+
 (provide 'test-docker-compose-mode)
 ;;; test-docker-compose-mode.el ends here
