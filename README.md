@@ -1,4 +1,6 @@
 # docker-compose-mode
+[![MELPA](https://melpa.org/packages/docker-compose-mode-badge.svg)](https://melpa.org/#/docker-compose-mode)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 Major mode for editing docker-compose files, providing completion of
 docker-compose keys through `completion-at-point-functions`.
@@ -9,18 +11,23 @@ ido-at-point.
 
 ## Installation
 
-You will soon be able to install this package from Melpa. Meanwhile, you'll have
-to save the `.el` files in your Emacs' load path.
+It's available on [MELPA](https://melpa.org/#/docker-compose-mode):
+
+```
+M-x package-install docker-compose-mode
+```
+
+Or you can just save the `.el` files in your Emacs' load path.
 
 ## Usage
 
-Manually:
+Add the following to your `init.el`:
 
 ``` emacs-lisp
 (require 'docker-compose-mode)
 ```
 
-Alternatively, if you're using `use-package`:
+Alternatively, if you prefer using `use-package`:
 
 ``` emacs-lisp
 (use-package docker-compose-mode)
