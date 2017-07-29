@@ -4,7 +4,7 @@
 
 ;; Author: Ricardo Martins
 ;; URL: https://github.com/meqif/docker-compose-mode
-;; Version: 0.1.0
+;; Version: 0.2.0
 ;; Keywords: convenience
 ;; Package-Requires: ((emacs "24.3") (dash "2.12.0"))
 
