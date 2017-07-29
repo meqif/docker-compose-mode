@@ -34,10 +34,41 @@
   :prefix "docker-compose-")
 
 (defcustom docker-compose-keywords
-  '("aliases" "args" "bridge" "build" "cache_from" "cap_add" "cap_drop" "cgroup_parent" "command" "configs" "container_name" "context" "credential_spec" "depends_on" "deploy" "devices" "dns" "dns_search" "dockerfile" "domainname" "driver" "driver_opts" "enable_ipv6" "entrypoint" "env_file" "environment" "expose" "external" "external_links" "extra_hosts" "healthcheck" "hostname" "image" "internal" "ipam" "ipc" "ipv4_address" "ipv6_address" "isolation" "labels" "links" "logging" "mac_address" "mode" "network_mode" "networks" "overlay" "pid" "placement" "ports" "privileged" "read_only" "replicas" "resources" "restart" "restart_policy" "secrets" "security_opt" "shm_size" "stdin_open" "stop_grace_period" "stop_signal" "sysctls" "tmpfs" "tty" "ulimits" "update_config" "user" "userns_mode" "volumes" "working_dir")
-  "List of docker-compose keywords."
-  :type '(repeat string)
+  '(
+    ("1.0" . ("build" "cap_add" "cap_drop" "cgroup_parent" "command" "container_name" "cpu_quota" "cpu_shares" "cpuset" "devices" "dns" "dns_search" "dockerfile" "domainname" "entrypoint" "env_file" "environment" "expose" "extends" "external_links" "extra_hosts" "file" "hard" "hostname" "image" "ipc" "labels" "links" "log_driver" "log_opt" "mac_address" "mem_limit" "mem_swappiness" "memswap_limit" "net" "pid" "ports" "privileged" "read_only" "restart" "security_opt" "service" "shm_size" "soft" "stdin_open" "stop_signal" "tty" "ulimits" "user" "volume_driver" "volumes" "volumes_from" "working_dir"))
+    ("2.0" . ("aliases" "args" "build" "cap_add" "cap_drop" "cgroup_parent" "command" "container_name" "context" "cpu_quota" "cpu_shares" "cpuset" "depends_on" "devices" "dns" "dns_opt" "dns_search" "dockerfile" "domainname" "driver" "entrypoint" "env_file" "environment" "expose" "extends" "external_links" "extra_hosts" "file" "group_add" "hard" "hostname" "image" "ipc" "ipv4_address" "ipv6_address" "labels" "links" "logging" "mac_address" "mem_limit" "mem_reservation" "mem_swappiness" "memswap_limit" "network_mode" "networks" "oom_score_adj" "options" "pid" "ports" "privileged" "read_only" "restart" "security_opt" "service" "shm_size" "soft" "stdin_open" "stop_grace_period" "stop_signal" "tmpfs" "tty" "ulimits" "user" "version" "volume_driver" "volumes" "volumes_from" "working_dir"))
+    ("2.1" . ("aliases" "args" "build" "cap_add" "cap_drop" "cgroup_parent" "command" "container_name" "context" "cpu_quota" "cpu_shares" "cpuset" "depends_on" "devices" "dns" "dns_opt" "dns_search" "dockerfile" "domainname" "driver" "entrypoint" "env_file" "environment" "expose" "extends" "external_links" "extra_hosts" "file" "group_add" "hard" "healthcheck" "hostname" "image" "ipc" "ipv4_address" "ipv6_address" "isolation" "labels" "labels" "link_local_ips" "links" "logging" "mac_address" "mem_limit" "mem_reservation" "mem_swappiness" "memswap_limit" "network_mode" "networks" "oom_score_adj" "options" "pid" "pids_limit" "ports" "privileged" "read_only" "restart" "security_opt" "service" "shm_size" "soft" "stdin_open" "stop_grace_period" "stop_signal" "storage_opt" "sysctls" "tmpfs" "tty" "ulimits" "user" "userns_mode" "version" "volume_driver" "volumes" "volumes_from" "working_dir"))
+    ("2.2" . ("aliases" "args" "build" "cache_from" "cap_add" "cap_drop" "cgroup_parent" "command" "container_name" "context" "cpu_count" "cpu_percent" "cpu_quota" "cpu_shares" "cpus" "cpuset" "depends_on" "devices" "dns" "dns_opt" "dns_search" "dockerfile" "domainname" "driver" "entrypoint" "env_file" "environment" "expose" "extends" "external_links" "extra_hosts" "file" "group_add" "hard" "healthcheck" "hostname" "image" "init" "ipc" "ipv4_address" "ipv6_address" "isolation" "labels" "labels" "link_local_ips" "links" "logging" "mac_address" "mem_limit" "mem_reservation" "mem_swappiness" "memswap_limit" "network" "network_mode" "networks" "oom_score_adj" "options" "pid" "pids_limit" "ports" "privileged" "read_only" "restart" "scale" "security_opt" "service" "shm_size" "soft" "stdin_open" "stop_grace_period" "stop_signal" "storage_opt" "sysctls" "tmpfs" "tty" "ulimits" "user" "userns_mode" "version" "volume_driver" "volumes" "volumes_from" "working_dir"))
+    ("2.3" . ("aliases" "args" "build" "cache_from" "cap_add" "cap_drop" "cgroup_parent" "command" "container_name" "context" "cpu_count" "cpu_percent" "cpu_quota" "cpu_shares" "cpus" "cpuset" "depends_on" "devices" "dns" "dns_opt" "dns_search" "dockerfile" "domainname" "driver" "entrypoint" "env_file" "environment" "expose" "extends" "external_links" "extra_hosts" "file" "group_add" "hard" "healthcheck" "hostname" "image" "init" "ipc" "ipv4_address" "ipv6_address" "isolation" "labels" "labels" "link_local_ips" "links" "logging" "mac_address" "mem_limit" "mem_reservation" "mem_swappiness" "memswap_limit" "network" "network_mode" "networks" "oom_score_adj" "options" "pid" "pids_limit" "ports" "privileged" "read_only" "restart" "scale" "security_opt" "service" "shm_size" "soft" "stdin_open" "stop_grace_period" "stop_signal" "storage_opt" "sysctls" "target" "tmpfs" "tty" "ulimits" "user" "userns_mode" "version" "volume_driver" "volumes" "volumes_from" "working_dir"))
+    ("3.0" . ("aliases" "args" "build" "cap_add" "cap_drop" "cgroup_parent" "command" "container_name" "context" "depends_on" "deploy" "devices" "dns" "dns_search" "dockerfile" "domainname" "driver" "entrypoint" "env_file" "environment" "expose" "external_links" "extra_hosts" "hard" "healthcheck" "hostname" "image" "ipc" "ipv4_address" "ipv6_address" "labels" "links" "logging" "mac_address" "network_mode" "networks" "options" "pid" "ports" "privileged" "read_only" "restart" "security_opt" "shm_size" "soft" "stdin_open" "stop_grace_period" "stop_signal" "sysctls" "tmpfs" "tty" "ulimits" "user" "userns_mode" "version" "volumes" "working_dir"))
+    ("3.1" . ("aliases" "args" "build" "cap_add" "cap_drop" "cgroup_parent" "command" "container_name" "context" "depends_on" "deploy" "devices" "dns" "dns_search" "dockerfile" "domainname" "driver" "entrypoint" "env_file" "environment" "expose" "external_links" "extra_hosts" "hard" "healthcheck" "hostname" "image" "ipc" "ipv4_address" "ipv6_address" "labels" "links" "logging" "mac_address" "network_mode" "networks" "options" "pid" "ports" "privileged" "read_only" "restart" "secrets" "security_opt" "shm_size" "soft" "stdin_open" "stop_grace_period" "stop_signal" "sysctls" "tmpfs" "tty" "ulimits" "user" "userns_mode" "version" "volumes" "working_dir"))
+    ("3.2" . ("aliases" "args" "build" "cache_from" "cap_add" "cap_drop" "cgroup_parent" "command" "container_name" "context" "depends_on" "deploy" "devices" "dns" "dns_search" "dockerfile" "domainname" "driver" "entrypoint" "env_file" "environment" "expose" "external_links" "extra_hosts" "hard" "healthcheck" "hostname" "image" "ipc" "ipv4_address" "ipv6_address" "labels" "links" "logging" "mac_address" "network_mode" "networks" "options" "pid" "ports" "privileged" "read_only" "restart" "secrets" "security_opt" "shm_size" "soft" "stdin_open" "stop_grace_period" "stop_signal" "sysctls" "tmpfs" "tty" "ulimits" "user" "userns_mode" "version" "volumes" "working_dir"))
+    ("3.3" . ("aliases" "args" "build" "cache_from" "cap_add" "cap_drop" "cgroup_parent" "command" "configs" "container_name" "context" "credential_spec" "depends_on" "deploy" "devices" "dns" "dns_search" "dockerfile" "domainname" "driver" "entrypoint" "env_file" "environment" "expose" "external_links" "extra_hosts" "file" "hard" "healthcheck" "hostname" "image" "ipc" "ipv4_address" "ipv6_address" "labels" "labels" "links" "logging" "mac_address" "network_mode" "networks" "options" "pid" "ports" "privileged" "read_only" "registry" "restart" "secrets" "security_opt" "shm_size" "soft" "stdin_open" "stop_grace_period" "stop_signal" "sysctls" "tmpfs" "tty" "ulimits" "user" "userns_mode" "version" "volumes" "working_dir")))
+  "Association list of docker-compose keywords for each version."
+  :type '(alist :key-type string :value-type (repeat string))
   :group 'docker-compose)
+
+(defun docker-compose--find-version ()
+  "Find the version of the docker-compose file.
+It is assumed that files lacking an explicit 'version' key are
+version 1."
+  (save-excursion
+    (goto-char (point-min))
+    (if (looking-at "^version:\s*[\\'\"]?\\([2-9]\\(?:\.[0-9]\\)?\\)[\\'\"]?$")
+        (match-string-no-properties 1)
+      "1.0")))
+
+(defun docker-compose--normalize-version (version)
+  "Normalize VERSION to conform to <major>.<minor>."
+  (if (string-match-p "^[0-9]$" version)
+      (concat version ".0")
+    version))
+
+(defun docker-compose--keywords-for-buffer ()
+  "Obtain keywords appropriate for the current buffer's docker-compose version."
+  (let ((version
+         (docker-compose--normalize-version (docker-compose--find-version))))
+    (cdr (assoc version docker-compose-keywords))))
 
 (defun docker-compose--post-completion (_string status)
   "Execute actions after completing with candidate.
@@ -48,7 +79,7 @@ variable for additional information about STRING and STATUS."
 
 (defun docker-compose--candidates (prefix)
   "Obtain applicable candidates from the keywords list for the PREFIX."
-  (--filter (string-prefix-p prefix it) docker-compose-keywords))
+  (--filter (string-prefix-p prefix it) (docker-compose--keywords-for-buffer)))
 
 (defun docker-compose--prefix ()
   "Get a prefix and its starting and ending points from the current position."
