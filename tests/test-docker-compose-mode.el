@@ -36,12 +36,12 @@
   (let ((candidates '("aliases" "build" "env_file" "environment")))
 
     (it "returns nil when no applicable candidates are available"
-      (let ((docker-compose-keywords '()))
-        (expect (docker-compose--candidates "en") :to-equal nil)))
+      (spy-on 'docker-compose--keywords-for-buffer '())
+      (expect (docker-compose--candidates "en") :to-equal nil))
 
     (it "returns all the applicable candidates"
-      (let ((docker-compose-keywords candidates)
-            (expected-candidates '("env_file" "environment")))
+      (spy-on 'docker-compose--keywords-for-buffer :and-return-value candidates)
+      (let ((expected-candidates '("env_file" "environment")))
         (expect (docker-compose--candidates "en") :to-equal expected-candidates)))))
 
 (describe "Function: `docker-compose--find-version'"
