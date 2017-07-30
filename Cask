@@ -5,4 +5,5 @@
 (depends-on "yaml-mode")
 
 (development
- (depends-on "buttercup"))
+ (depends-on "buttercup")
+ (depends-on "f"))
