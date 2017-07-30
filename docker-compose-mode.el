@@ -6,7 +6,7 @@
 ;; URL: https://github.com/meqif/docker-compose-mode
 ;; Version: 0.2.0
 ;; Keywords: convenience
-;; Package-Requires: ((emacs "24.3") (dash "2.12.0"))
+;; Package-Requires: ((emacs "24.3") (dash "2.12.0") (yaml-mode "0.0.12"))
 
 ;; Licensed under the Apache License, Version 2.0 (the "License");
 ;; you may not use this file except in compliance with the License.
