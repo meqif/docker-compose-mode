@@ -36,6 +36,7 @@ Alternatively, if you prefer using `use-package`:
 
 ## Customization
 
-By default, the keyword completion function suggests docker-compose 3.3 keywords.
+By default, the keyword completion function detects the docker-compose version
+of the current buffer and suggests the appropriate keywords.
 
 You can change the candidates offered by the backend by customizing `docker-compose-keywords`.
