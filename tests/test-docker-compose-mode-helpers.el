@@ -25,16 +25,7 @@
     (describe "given the docker-compose v1 schema"
       (it "returns a list with all the keywords"
         (let ((expected-keywords
-               '("build" "cap_add" "cap_drop" "cgroup_parent" "command"
-                 "container_name" "cpu_quota" "cpu_shares" "cpuset" "devices"
-                 "dns" "dns_search" "dockerfile" "domainname" "entrypoint"
-                 "env_file" "environment" "expose" "extends" "external_links"
-                 "extra_hosts" "file" "hard" "hostname" "image" "ipc" "labels"
-                 "links" "log_driver" "log_opt" "mac_address" "mem_limit"
-                 "mem_swappiness" "memswap_limit" "net" "pid" "ports"
-                 "privileged" "read_only" "restart" "security_opt" "service"
-                 "shm_size" "soft" "stdin_open" "stop_signal" "tty" "ulimits"
-                 "user" "volume_driver" "volumes" "volumes_from" "working_dir")))
+               '(("^[a-zA-Z0-9._-]+$" ("build") ("cap_add") ("cap_drop") ("cgroup_parent") ("command") ("container_name") ("cpu_shares") ("cpu_quota") ("cpuset") ("devices") ("dns") ("dns_search") ("dockerfile") ("domainname") ("entrypoint") ("env_file") ("environment" ((".+"))) ("expose") ("extends" (("service") ("file"))) ("extra_hosts" ((".+"))) ("external_links") ("hostname") ("image") ("ipc") ("labels" ((".+"))) ("links") ("log_driver") ("log_opt") ("mac_address") ("mem_limit") ("memswap_limit") ("mem_swappiness") ("net") ("pid") ("ports") ("privileged") ("read_only") ("restart") ("security_opt") ("shm_size") ("stdin_open") ("stop_signal") ("tty") ("ulimits" ("^[a-z]+$" (("hard") ("soft")))) ("user") ("volumes") ("volume_driver") ("volumes_from") ("working_dir")))))
           (expect
            (docker-compose--extract-keywords-from-schema-file schema-v1-filename)
            :to-equal
