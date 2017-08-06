@@ -36,7 +36,7 @@
                  "shm_size" "soft" "stdin_open" "stop_signal" "tty" "ulimits"
                  "user" "volume_driver" "volumes" "volumes_from" "working_dir")))
           (expect
-           (sort (docker-compose--extract-keywords-from-schema-file schema-v1-filename) #'string<)
+           (docker-compose--extract-keywords-from-schema-file schema-v1-filename)
            :to-equal
            expected-keywords))))))
 
