@@ -22,59 +22,54 @@
 (require 'f)
 (require 'json)
 
-(defun docker-compose-mode--extract-keywords-from-schema-tree (tree)
+(defun docker-compose--extract-keywords-from-schema-tree (root tree)
   "Extract a list of keywords from docker-compose JSON schema TREE."
-  (-flatten
-   (--map
-    (pcase it
-      (`("definitions" . ,rest) (docker-compose-mode--read-definitions rest))
-      (`("properties" . ,rest) (docker-compose-mode--read-properties rest))
-      (`("patternProperties" . ,rest) (docker-compose-mode--read-pattern-properties rest)))
-    tree)))
+  (let-alist tree
+    (-concat
+     (when .$ref
+       (docker-compose--extract-keywords-from-schema-tree root (docker-compose--dereference root .$ref)))
+     (docker-compose--read-one-of root .oneOf)
+     (docker-compose--read-properties root .properties)
+     (docker-compose--read-pattern-properties root .patternProperties))))
 
-(defun docker-compose-mode--read-definitions (definitions)
-  "Extract keywords from a DEFINITIONS node in the docker-compose schema tree."
-  (--map
-   (pcase it
-     (`("service" . ,rest)
-      (docker-compose-mode--extract-keywords-from-schema-tree rest)))
-   definitions))
+(defun docker-compose--dereference (tree reference)
+  "Find definition for a REFERENCE in the given JSON schema TREE."
+  (string-match "#/definitions/\\(.+\\)" reference)
+  (let ((refname (intern-soft (match-string-no-properties 1 reference)))
+        (definitions (cdr (assq 'definitions tree))))
+    (cdr (assq refname definitions))))
 
-(defun docker-compose-mode--read-pattern-properties (pattern-properties)
+(defun docker-compose--read-pattern-properties (root pattern-properties)
   "Extract keywords from a PATTERN-PROPERTIES node in the docker-compose schema tree."
-  (--map
-   (pcase it
-     (`(,_keyword . (("oneOf" . ,rest)))
-      (--map (docker-compose-mode--extract-keywords-from-schema-tree it) rest)))
-   pattern-properties))
+  (--map (docker-compose--extract-keywords-from-schema-tree root it) pattern-properties))
 
-(defun docker-compose-mode--read-properties (properties)
+(defun docker-compose--read-properties (root properties)
   "Extract keywords from a PROPERTIES node in the docker-compose schema tree."
   (--map
-   (pcase it
-     (`(,keyword . (("type" . ,_type) . ,rest))
-      (cons keyword
-            (docker-compose-mode--extract-keywords-from-schema-tree rest)))
-     (`(,keyword . (("$ref" . ,_reference))) keyword)
-     (`(,keyword . (("oneOf" . ,alternatives)))
-      (cons keyword
-            (--map (docker-compose-mode--extract-keywords-from-schema-tree it)
-             alternatives))))
+   (-let (((keyword . rest) it))
+     (cons keyword (docker-compose--extract-keywords-from-schema-tree root rest)))
    properties))
 
-(defun docker-compose-mode--extract-keywords-from-schema-file (path)
-  "Extract a list of keywords from the docker-compose JSON schema file at PATH."
-  (let ((json-key-type 'string))
-    (docker-compose-mode--extract-keywords-from-schema-tree (json-read-file path))))
+(defun docker-compose--read-one-of (tree alternatives)
+  "Extract keywords from the ALTERNATIVES of a 'oneOf' node in the JSON schema TREE."
+  (-non-nil
+   (--map (docker-compose--extract-keywords-from-schema-tree tree it) alternatives)))
 
-(defun docker-compose-mode--generate-lists-of-keywords (path)
+(defun docker-compose--extract-keywords-from-schema-file (path)
+  "Extract a list of keywords from the docker-compose JSON schema file at PATH."
+  (let ((tree (json-read-file path)))
+    (let ((keywords (docker-compose--extract-keywords-from-schema-tree tree tree)))
+      (sort
+       (-map #'symbol-name (-flatten keywords)) #'string<))))
+
+(defun docker-compose--generate-lists-of-keywords (path)
   "Generate a list of lists of docker-compose keywords by extracting them from the schema files present in PATH."
-    (--map
-     (progn
-       (string-match "config_schema_v\\(.*\\).json" it)
-       (cons (docker-compose--normalize-version (match-string-no-properties 1 it))
-             (sort (docker-compose-mode--extract-keywords-from-schema-file it) #'string<)))
-     (f-glob "config_schema_*.json" path)))
+  (--map
+   (progn
+     (string-match "config_schema_v\\(.*\\).json" it)
+     (cons (docker-compose--normalize-version (match-string-no-properties 1 it))
+           (docker-compose--extract-keywords-from-schema-file it)))
+   (f-glob "config_schema_*.json" path)))
 
 (provide 'docker-compose-mode-helpers)
 ;;; docker-compose-mode-helpers.el ends here

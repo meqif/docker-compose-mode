@@ -1,4 +1,4 @@
-;;; docker-compose-mode.el --- major mode for editing docker-compose files -*- lexical-binding: t; -*-
+;;; docker-compose-mode.el --- Major mode for editing docker-compose files -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2017  Ricardo Martins
 

@@ -21,7 +21,7 @@
 (defconst schema-v1-filename "config_schema_v1.json")
 
 (when (file-exists-p schema-v1-filename)
-  (describe "Function: `docker-compose-mode--extract-keywords-from-schema-tree'"
+  (describe "Function: `docker-compose--extract-keywords-from-schema-tree'"
     (describe "given the docker-compose v1 schema"
       (it "returns a list with all the keywords"
         (let ((expected-keywords
@@ -36,7 +36,7 @@
                  "shm_size" "soft" "stdin_open" "stop_signal" "tty" "ulimits"
                  "user" "volume_driver" "volumes" "volumes_from" "working_dir")))
           (expect
-           (sort (docker-compose-mode--extract-keywords-from-schema-file schema-v1-filename) #'string<)
+           (docker-compose--extract-keywords-from-schema-file schema-v1-filename)
            :to-equal
            expected-keywords))))))
 
