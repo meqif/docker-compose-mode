@@ -26,23 +26,41 @@
       (goto-char 50)
       (expect (docker-compose--prefix) :to-equal '("underscore_" 39 50))))
 
-  (it "returns nil when the key is suffixed with a colon"
-    (with-temp-buffer
-      (insert "  foo:")
-      (goto-char 7)
-      (expect (docker-compose--prefix) :to-equal nil))))
+  (describe "when the key is suffixed with a colon"
+    (it "returns nil"
+      (with-temp-buffer
+        (insert "  foo:")
+        (goto-char 7)
+        (expect (docker-compose--prefix) :to-equal nil))))
+
+  (describe "when the current partially written key is a top-level key"
+    (it "returns it"
+      (with-temp-buffer
+        (insert "version: 2\nservices:\n  consumer:\n    build: .\n\n  web:\n    image: foo\n\nnet")
+        (goto-char 74)
+        (expect (docker-compose--prefix) :to-equal '("net" 71 74))))))
 
 (describe "Function: `docker-compose--candidates'"
-  (let ((candidates '("aliases" "build" "env_file" "environment")))
-
-    (it "returns nil when no applicable candidates are available"
-      (spy-on 'docker-compose--keywords-for-buffer '())
-      (expect (docker-compose--candidates "en") :to-equal nil))
+  (let ((candidates '(("version") ("services" ("^[a-zA-Z0-9._-]+$" ("build" (("context") ("dockerfile") ("args" ((".+"))))) ("cap_add") ("cap_drop") ("cgroup_parent") ("command") ("container_name") ("cpu_shares") ("cpu_quota") ("cpuset") ("depends_on") ("devices") ("dns") ("dns_opt") ("dns_search") ("domainname") ("entrypoint") ("env_file") ("environment" ((".+"))) ("expose") ("extends" (("service") ("file"))) ("external_links") ("extra_hosts" ((".+"))) ("hostname") ("image") ("ipc") ("labels" ((".+"))) ("links") ("logging" ("driver") ("options")) ("mac_address") ("mem_limit") ("mem_reservation") ("mem_swappiness") ("memswap_limit") ("network_mode") ("networks" (("^[a-zA-Z0-9._-]+$" (("aliases") ("ipv4_address") ("ipv6_address"))))) ("oom_score_adj") ("group_add") ("pid") ("ports") ("privileged") ("read_only") ("restart") ("security_opt") ("shm_size") ("stdin_open") ("stop_grace_period") ("stop_signal") ("tmpfs") ("tty") ("ulimits" ("^[a-z]+$" (("hard") ("soft")))) ("user") ("volumes") ("volume_driver") ("volumes_from") ("working_dir"))) ("networks" ("^[a-zA-Z0-9._-]+$" ("driver") ("driver_opts" ("^.+$")) ("ipam" ("driver") ("config") ("options" ("^.+$"))) ("external" ("name")) ("internal"))) ("volumes" ("^[a-zA-Z0-9._-]+$" ("driver") ("driver_opts" ("^.+$")) ("external" ("name")))))))
 
     (it "returns all the applicable candidates"
       (spy-on 'docker-compose--keywords-for-buffer :and-return-value candidates)
+      (spy-on 'docker-compose--find-context :and-return-value '("services" "web"))
       (let ((expected-candidates '("env_file" "environment")))
-        (expect (docker-compose--candidates "en") :to-equal expected-candidates)))))
+        (expect (docker-compose--candidates "env") :to-equal expected-candidates)))
+
+    (describe "when no applicable candidates are available"
+      (it "returns nil"
+        (spy-on 'docker-compose--keywords-for-buffer '())
+        (expect (docker-compose--candidates "en") :to-equal nil)))
+
+    (describe "when the prefix is a top-level key"
+      (it "returns all the applicable top-level candidates"
+        (with-temp-buffer
+          (insert "version: 2\nservices:\n  consumer:\n    build: .\n\n  web:\n    image: foo\n\nnet")
+          (goto-char 74)
+          (expect (docker-compose--prefix) :to-equal '("net" 71 74))
+          (expect (docker-compose--candidates "net") :to-equal '("networks")))))))
 
 (describe "Function: `docker-compose--find-context'"
   (it "returns a list with the ancestor keywords"
