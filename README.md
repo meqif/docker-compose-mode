@@ -3,8 +3,8 @@
 [![MELPA Stable](http://stable.melpa.org/packages/docker-compose-mode-badge.svg)](http://stable.melpa.org/#/docker-compose-mode)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-Major mode for editing docker-compose files, providing completion of
-docker-compose keys through `completion-at-point-functions`.
+Major mode for editing docker-compose files, providing context-aware completion
+of docker-compose keys through `completion-at-point-functions`.
 
 The completions can be used with the completion system shipped with vanilla
 Emacs, and 3rd-party frontends like company-mode, autocomplete, and

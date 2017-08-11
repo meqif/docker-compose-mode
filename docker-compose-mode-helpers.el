@@ -41,13 +41,16 @@
 
 (defun docker-compose--read-pattern-properties (root pattern-properties)
   "Extract keywords from a PATTERN-PROPERTIES node in the docker-compose schema tree."
-  (--map (docker-compose--extract-keywords-from-schema-tree root it) pattern-properties))
+  (--map
+   (-let (((regex . rest) it))
+     (cons (symbol-name regex) (docker-compose--extract-keywords-from-schema-tree root rest)))
+   pattern-properties))
 
 (defun docker-compose--read-properties (root properties)
   "Extract keywords from a PROPERTIES node in the docker-compose schema tree."
   (--map
    (-let (((keyword . rest) it))
-     (cons keyword (docker-compose--extract-keywords-from-schema-tree root rest)))
+     (cons (symbol-name keyword) (docker-compose--extract-keywords-from-schema-tree root rest)))
    properties))
 
 (defun docker-compose--read-one-of (tree alternatives)
@@ -58,9 +61,7 @@
 (defun docker-compose--extract-keywords-from-schema-file (path)
   "Extract a list of keywords from the docker-compose JSON schema file at PATH."
   (let ((tree (json-read-file path)))
-    (let ((keywords (docker-compose--extract-keywords-from-schema-tree tree tree)))
-      (sort
-       (-map #'symbol-name (-flatten keywords)) #'string<))))
+    (docker-compose--extract-keywords-from-schema-tree tree tree)))
 
 (defun docker-compose--generate-lists-of-keywords (path)
   "Generate a list of lists of docker-compose keywords by extracting them from the schema files present in PATH."
