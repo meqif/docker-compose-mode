@@ -44,6 +44,24 @@
       (let ((expected-candidates '("env_file" "environment")))
         (expect (docker-compose--candidates "en") :to-equal expected-candidates)))))
 
+(describe "Function: `docker-compose--find-context'"
+  (it "returns a list with the ancestor keywords"
+    (with-temp-buffer
+      (insert "version: 2\nservices:\n  web:\n    image: foo\n    env")
+      (goto-char 51)
+      (expect (docker-compose--prefix) :to-equal '("env" 48 51))
+      (expect (docker-compose--find-context) :to-equal '("services" "web")))
+    (with-temp-buffer
+      (insert "version: 2\nservices:\n  consumer:\n    build: .\n\n  web:\n    image: foo\n    env")
+      (goto-char 77)
+      (expect (docker-compose--prefix) :to-equal '("env" 74 77))
+      (expect (docker-compose--find-context) :to-equal '("services" "web")))
+    (with-temp-buffer
+      (insert "version: 2\nservices:\n  consumer:\n    build: .\n\n  web:\n    image: foo\n")
+      (goto-char 70)
+      (expect (docker-compose--prefix) :to-equal nil)
+      (expect (docker-compose--find-context) :to-equal '()))))
+
 (describe "Function: `docker-compose--find-version'"
   (describe "when the version is not specified"
     (it "returns \"1.0\""
