@@ -60,7 +60,17 @@
           (insert "version: 2\nservices:\n  consumer:\n    build: .\n\n  web:\n    image: foo\n\nnet")
           (goto-char 74)
           (expect (docker-compose--prefix) :to-equal '("net" 71 74))
-          (expect (docker-compose--candidates "net") :to-equal '("networks")))))))
+          (expect (docker-compose--candidates "net") :to-equal '("networks")))))
+
+    (describe "when the parent context has a 'oneOf' property"
+      (it "returns all the applicable candidates"
+        (spy-on 'docker-compose--keywords-for-buffer :and-return-value candidates)
+        (with-temp-buffer
+          (insert "version: \"2\"\n\nservices:\n  common: &BASE\n    build:\n      con\n      args:\n        BUNDLE_GITHUB__COM: ${BUNDLE_GITHUB__COM}\n")
+          (goto-char 61)
+          (expect (docker-compose--prefix) :to-equal '("con" 58 61))
+          (expect (docker-compose--find-context) :to-equal '("services" "common" "build"))
+          (expect (docker-compose--candidates "con") :to-equal '("context")))))))
 
 (describe "Function: `docker-compose--find-context'"
   (it "returns a list with the ancestor keywords"
