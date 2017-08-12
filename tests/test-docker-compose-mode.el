@@ -41,7 +41,7 @@
         (expect (docker-compose--prefix) :to-equal '("net" 71 74))))))
 
 (describe "Function: `docker-compose--candidates'"
-  (let ((candidates '(("version") ("services" ("^[a-zA-Z0-9._-]+$" ("build" (("context") ("dockerfile") ("args" ((".+"))))) ("cap_add") ("cap_drop") ("cgroup_parent") ("command") ("container_name") ("cpu_shares") ("cpu_quota") ("cpuset") ("depends_on") ("devices") ("dns") ("dns_opt") ("dns_search") ("domainname") ("entrypoint") ("env_file") ("environment" ((".+"))) ("expose") ("extends" (("service") ("file"))) ("external_links") ("extra_hosts" ((".+"))) ("hostname") ("image") ("ipc") ("labels" ((".+"))) ("links") ("logging" ("driver") ("options")) ("mac_address") ("mem_limit") ("mem_reservation") ("mem_swappiness") ("memswap_limit") ("network_mode") ("networks" (("^[a-zA-Z0-9._-]+$" (("aliases") ("ipv4_address") ("ipv6_address"))))) ("oom_score_adj") ("group_add") ("pid") ("ports") ("privileged") ("read_only") ("restart") ("security_opt") ("shm_size") ("stdin_open") ("stop_grace_period") ("stop_signal") ("tmpfs") ("tty") ("ulimits" ("^[a-z]+$" (("hard") ("soft")))) ("user") ("volumes") ("volume_driver") ("volumes_from") ("working_dir"))) ("networks" ("^[a-zA-Z0-9._-]+$" ("driver") ("driver_opts" ("^.+$")) ("ipam" ("driver") ("config") ("options" ("^.+$"))) ("external" ("name")) ("internal"))) ("volumes" ("^[a-zA-Z0-9._-]+$" ("driver") ("driver_opts" ("^.+$")) ("external" ("name")))))))
+  (let ((candidates '(("version") ("services" ("^[a-zA-Z0-9._-]+$" ("build" ("context") ("dockerfile") ("args" (".+"))) ("cap_add") ("cap_drop") ("cgroup_parent") ("command") ("container_name") ("cpu_shares") ("cpu_quota") ("cpuset") ("depends_on") ("devices") ("dns") ("dns_opt") ("dns_search") ("domainname") ("entrypoint") ("env_file") ("environment" (".+")) ("expose") ("extends" ("service") ("file")) ("external_links") ("extra_hosts" (".+")) ("hostname") ("image") ("ipc") ("labels" (".+")) ("links") ("logging" ("driver") ("options")) ("mac_address") ("mem_limit") ("mem_reservation") ("mem_swappiness") ("memswap_limit") ("network_mode") ("networks" ("^[a-zA-Z0-9._-]+$" ("aliases") ("ipv4_address") ("ipv6_address"))) ("oom_score_adj") ("group_add") ("pid") ("ports") ("privileged") ("read_only") ("restart") ("security_opt") ("shm_size") ("stdin_open") ("stop_grace_period") ("stop_signal") ("tmpfs") ("tty") ("ulimits" ("^[a-z]+$" ("hard") ("soft"))) ("user") ("volumes") ("volume_driver") ("volumes_from") ("working_dir"))) ("networks" ("^[a-zA-Z0-9._-]+$" ("driver") ("driver_opts" ("^.+$")) ("ipam" ("driver") ("config") ("options" ("^.+$"))) ("external" ("name")) ("internal"))) ("volumes" ("^[a-zA-Z0-9._-]+$" ("driver") ("driver_opts" ("^.+$")) ("external" ("name")))))))
 
     (it "returns all the applicable candidates"
       (spy-on 'docker-compose--keywords-for-buffer :and-return-value candidates)
@@ -60,7 +60,27 @@
           (insert "version: 2\nservices:\n  consumer:\n    build: .\n\n  web:\n    image: foo\n\nnet")
           (goto-char 74)
           (expect (docker-compose--prefix) :to-equal '("net" 71 74))
-          (expect (docker-compose--candidates "net") :to-equal '("networks")))))))
+          (expect (docker-compose--candidates "net") :to-equal '("networks")))))
+
+    (describe "when the parent context has a 'oneOf' property"
+      (it "returns all the applicable candidates"
+        (spy-on 'docker-compose--keywords-for-buffer :and-return-value candidates)
+        (with-temp-buffer
+          (insert "version: \"2\"\n\nservices:\n  common: &BASE\n    build:\n      con\n      args:\n        BUNDLE_GITHUB__COM: ${BUNDLE_GITHUB__COM}\n")
+          (goto-char 61)
+          (expect (docker-compose--prefix) :to-equal '("con" 58 61))
+          (expect (docker-compose--find-context) :to-equal '("services" "common" "build"))
+          (expect (docker-compose--candidates "con") :to-equal '("context")))))
+
+    (describe "when the prefix is empty"
+      (it "returns all the applicable candidates"
+        (spy-on 'docker-compose--keywords-for-buffer :and-return-value candidates)
+        (with-temp-buffer
+          (insert "version: \"2\"\n\nservices:\n  common: &BASE\n    build:\n      \n      context: .\n      args:\n        BUNDLE_GITHUB__COM: ${BUNDLE_GITHUB__COM}\n")
+          (goto-char 58)
+          (expect (docker-compose--prefix) :to-equal nil)
+          (expect (docker-compose--find-context) :to-equal '("services" "common" "build"))
+          (expect (docker-compose--candidates nil) :to-equal '("context" "dockerfile" "args")))))))
 
 (describe "Function: `docker-compose--find-context'"
   (it "returns a list with the ancestor keywords"
