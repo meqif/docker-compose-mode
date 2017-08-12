@@ -56,7 +56,7 @@
 (defun docker-compose--read-one-of (tree alternatives)
   "Extract keywords from the ALTERNATIVES of a 'oneOf' node in the JSON schema TREE."
   (-non-nil
-   (--map (docker-compose--extract-keywords-from-schema-tree tree it) alternatives)))
+   (--mapcat (docker-compose--extract-keywords-from-schema-tree tree it) alternatives)))
 
 (defun docker-compose--extract-keywords-from-schema-file (path)
   "Extract a list of keywords from the docker-compose JSON schema file at PATH."
