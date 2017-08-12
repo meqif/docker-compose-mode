@@ -132,7 +132,9 @@ variable for additional information about STRING and STATUS."
           (nodes (docker-compose--find-context))
           (subtree (docker-compose--find-subtree nodes keywords))
           (viable-candidates (-map #'car subtree) ))
-    (--filter (string-prefix-p prefix it) viable-candidates)))
+    (if prefix
+        (--filter (string-prefix-p prefix it) viable-candidates)
+      viable-candidates)))
 
 (defun docker-compose--prefix ()
   "Get a prefix and its starting and ending points from the current position."
