@@ -70,7 +70,17 @@
           (goto-char 61)
           (expect (docker-compose--prefix) :to-equal '("con" 58 61))
           (expect (docker-compose--find-context) :to-equal '("services" "common" "build"))
-          (expect (docker-compose--candidates "con") :to-equal '("context")))))))
+          (expect (docker-compose--candidates "con") :to-equal '("context")))))
+
+    (describe "when the prefix is empty"
+      (it "returns all the applicable candidates"
+        (spy-on 'docker-compose--keywords-for-buffer :and-return-value candidates)
+        (with-temp-buffer
+          (insert "version: \"2\"\n\nservices:\n  common: &BASE\n    build:\n      \n      context: .\n      args:\n        BUNDLE_GITHUB__COM: ${BUNDLE_GITHUB__COM}\n")
+          (goto-char 58)
+          (expect (docker-compose--prefix) :to-equal nil)
+          (expect (docker-compose--find-context) :to-equal '("services" "common" "build"))
+          (expect (docker-compose--candidates nil) :to-equal '("context" "dockerfile" "args")))))))
 
 (describe "Function: `docker-compose--find-context'"
   (it "returns a list with the ancestor keywords"
