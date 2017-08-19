@@ -119,15 +119,21 @@ variable for additional information about STRING and STATUS."
         (docker-compose--find-subtree (cdr nodes) (cdr subtree)))
     tree))
 
+(defun docker-compose--filter-candidates-tree (prefix tree)
+  "Return a list of candidate keywords matching a PREFIX in a keyword TREE."
+  (let ((candidates nil))
+    (dolist (subtree tree (nreverse candidates))
+      (when (string-prefix-p prefix (car subtree))
+        (push (car subtree) candidates)))))
+
 (defun docker-compose--candidates (prefix)
   "Obtain applicable candidates from the keywords list for the PREFIX."
   (-let* ((keywords (docker-compose--keywords-for-buffer))
           (nodes (docker-compose--find-context))
-          (subtree (docker-compose--find-subtree nodes keywords))
-          (viable-candidates (-map #'car subtree) ))
+          (subtree (docker-compose--find-subtree nodes keywords)))
     (if prefix
-        (--filter (string-prefix-p prefix it) viable-candidates)
-      viable-candidates)))
+        (docker-compose--filter-candidates-tree prefix subtree)
+      (-map #'car subtree))))
 
 (defun docker-compose--prefix ()
   "Get a prefix and its starting and ending points from the current position."
