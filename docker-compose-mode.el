@@ -88,32 +88,25 @@ variable for additional information about STRING and STATUS."
   (when (eq status 'finished)
     (insert ": ")))
 
-(defun docker-compose--indentation-of-current-line ()
-  "Return the indentation of the current line."
-  (save-excursion
-    (beginning-of-line)
-    (when (looking-at "^[\t ]+")
-      (length (match-string-no-properties 0)))))
-
-(defun docker-compose--indentation-and-keyword-of-current-line ()
+(defsubst docker-compose--indentation-and-keyword-of-current-line ()
   "Return the indentation and keyword, if present, of the current line."
-  (save-excursion
-    (beginning-of-line)
-    (when (looking-at "^\\([\t ]*\\)\\([a-zA-Z][a-zA-Z0-9_]+\\)?:")
-      (list (length (match-string-no-properties 1))
-            (match-string-no-properties 2)))))
+  (beginning-of-line)
+  (let ((indentation (skip-chars-forward "\t ")))
+    (when (looking-at "\\([a-zA-Z][a-zA-Z0-9_]+\\)?:")
+      (list indentation (match-string-no-properties 1)))))
 
 (defun docker-compose--find-context ()
   "Return a list with the ancestor keys of the current point."
   (save-excursion
+    (beginning-of-line)
     (-let* ((keywords '())
-            (previous-indentation (or (docker-compose--indentation-of-current-line) 0)))
+            (previous-indentation (skip-chars-forward "\t ")))
       (cl-loop
        do
        (forward-line -1)
        (-let (((current-indentation keyword) (docker-compose--indentation-and-keyword-of-current-line)))
          (when (and current-indentation (< current-indentation previous-indentation))
-           (setq keywords (cons keyword keywords )
+           (setq keywords (cons keyword keywords)
                  previous-indentation current-indentation)))
        until (or (= previous-indentation 0) (bobp)))
       keywords)))
@@ -126,15 +119,21 @@ variable for additional information about STRING and STATUS."
         (docker-compose--find-subtree (cdr nodes) (cdr subtree)))
     tree))
 
+(defun docker-compose--filter-candidates-tree (prefix tree)
+  "Return a list of candidate keywords matching a PREFIX in a keyword TREE."
+  (let ((candidates nil))
+    (dolist (subtree tree (nreverse candidates))
+      (when (string-prefix-p prefix (car subtree))
+        (push (car subtree) candidates)))))
+
 (defun docker-compose--candidates (prefix)
   "Obtain applicable candidates from the keywords list for the PREFIX."
   (-let* ((keywords (docker-compose--keywords-for-buffer))
           (nodes (docker-compose--find-context))
-          (subtree (docker-compose--find-subtree nodes keywords))
-          (viable-candidates (-map #'car subtree) ))
+          (subtree (docker-compose--find-subtree nodes keywords)))
     (if prefix
-        (--filter (string-prefix-p prefix it) viable-candidates)
-      viable-candidates)))
+        (docker-compose--filter-candidates-tree prefix subtree)
+      (-map #'car subtree))))
 
 (defun docker-compose--prefix ()
   "Get a prefix and its starting and ending points from the current position."
