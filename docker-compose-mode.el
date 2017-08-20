@@ -88,26 +88,22 @@ variable for additional information about STRING and STATUS."
   (when (eq status 'finished)
     (insert ": ")))
 
-(defsubst docker-compose--indentation-and-keyword-of-current-line ()
-  "Return the indentation and keyword, if present, of the current line."
-  (beginning-of-line)
-  (let ((indentation (skip-chars-forward "\t ")))
-    (when (looking-at "\\([a-zA-Z][a-zA-Z0-9_]+\\)?:")
-      (list indentation (match-string-no-properties 1)))))
-
 (defun docker-compose--find-context ()
   "Return a list with the ancestor keys of the current point."
   (save-excursion
     (beginning-of-line)
-    (-let* ((keywords '())
-            (previous-indentation (skip-chars-forward "\t ")))
+    (-let* ((keywords nil)
+            (previous-indentation (skip-chars-forward "\t "))
+            (current-indentation nil))
       (cl-loop
        do
        (forward-line -1)
-       (-let (((current-indentation keyword) (docker-compose--indentation-and-keyword-of-current-line)))
-         (when (and current-indentation (< current-indentation previous-indentation))
-           (setq keywords (cons keyword keywords)
-                 previous-indentation current-indentation)))
+       (setq current-indentation (skip-chars-forward "\t "))
+       (when (and (< current-indentation previous-indentation)
+                  (looking-at "\\([a-zA-Z][a-zA-Z0-9_]+\\):"))
+         (setq previous-indentation current-indentation)
+         (push (match-string-no-properties 1) keywords))
+
        until (or (= previous-indentation 0) (bobp)))
       keywords)))
 
