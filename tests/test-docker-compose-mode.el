@@ -49,6 +49,13 @@
       (let ((expected-candidates '("env_file" "environment")))
         (expect (docker-compose--candidates "env") :to-equal expected-candidates)))
 
+    (describe "when the buffer version is invalid"
+      (it "returns nil"
+        (with-temp-buffer
+          (insert "version: 2\nservices:\n  consumer:\n    build: .\n\n  web:\n    image: foo\n\nnet")
+          (goto-char 74)
+          (expect (docker-compose--candidates "net") :to-equal nil))))
+
     (describe "when no applicable candidates are available"
       (it "returns nil"
         (spy-on 'docker-compose--keywords-for-buffer '())
