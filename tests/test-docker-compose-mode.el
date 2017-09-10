@@ -36,9 +36,9 @@
   (describe "when the current partially written key is a top-level key"
     (it "returns it"
       (with-temp-buffer
-        (insert "version: 2\nservices:\n  consumer:\n    build: .\n\n  web:\n    image: foo\n\nnet")
-        (goto-char 74)
-        (expect (docker-compose--prefix) :to-equal '("net" 71 74))))))
+        (insert "version: '2'\nservices:\n  consumer:\n    build: .\n\n  web:\n    image: foo\n\nnet")
+        (goto-char 76)
+        (expect (docker-compose--prefix) :to-equal '("net" 73 76))))))
 
 (describe "Function: `docker-compose--candidates'"
   (let ((candidates '(("version") ("services" ("^[a-zA-Z0-9._-]+$" ("build" ("context") ("dockerfile") ("args" (".+"))) ("cap_add") ("cap_drop") ("cgroup_parent") ("command") ("container_name") ("cpu_shares") ("cpu_quota") ("cpuset") ("depends_on") ("devices") ("dns") ("dns_opt") ("dns_search") ("domainname") ("entrypoint") ("env_file") ("environment" (".+")) ("expose") ("extends" ("service") ("file")) ("external_links") ("extra_hosts" (".+")) ("hostname") ("image") ("ipc") ("labels" (".+")) ("links") ("logging" ("driver") ("options")) ("mac_address") ("mem_limit") ("mem_reservation") ("mem_swappiness") ("memswap_limit") ("network_mode") ("networks" ("^[a-zA-Z0-9._-]+$" ("aliases") ("ipv4_address") ("ipv6_address"))) ("oom_score_adj") ("group_add") ("pid") ("ports") ("privileged") ("read_only") ("restart") ("security_opt") ("shm_size") ("stdin_open") ("stop_grace_period") ("stop_signal") ("tmpfs") ("tty") ("ulimits" ("^[a-z]+$" ("hard") ("soft"))) ("user") ("volumes") ("volume_driver") ("volumes_from") ("working_dir"))) ("networks" ("^[a-zA-Z0-9._-]+$" ("driver") ("driver_opts" ("^.+$")) ("ipam" ("driver") ("config") ("options" ("^.+$"))) ("external" ("name")) ("internal"))) ("volumes" ("^[a-zA-Z0-9._-]+$" ("driver") ("driver_opts" ("^.+$")) ("external" ("name")))))))
@@ -64,9 +64,9 @@
     (describe "when the prefix is a top-level key"
       (it "returns all the applicable top-level candidates"
         (with-temp-buffer
-          (insert "version: 2\nservices:\n  consumer:\n    build: .\n\n  web:\n    image: foo\n\nnet")
-          (goto-char 74)
-          (expect (docker-compose--prefix) :to-equal '("net" 71 74))
+          (insert "version: '2'\nservices:\n  consumer:\n    build: .\n\n  web:\n    image: foo\n\nnet")
+          (goto-char 76)
+          (expect (docker-compose--prefix) :to-equal '("net" 73 76))
           (expect (docker-compose--candidates "net") :to-equal '("networks")))))
 
     (describe "when the parent context has a 'oneOf' property"
@@ -92,18 +92,18 @@
 (describe "Function: `docker-compose--find-context'"
   (it "returns a list with the ancestor keywords"
     (with-temp-buffer
-      (insert "version: 2\nservices:\n  web:\n    image: foo\n    env")
-      (goto-char 51)
-      (expect (docker-compose--prefix) :to-equal '("env" 48 51))
+      (insert "version: '2'\nservices:\n  web:\n    image: foo\n    env")
+      (goto-char 53)
+      (expect (docker-compose--prefix) :to-equal '("env" 50 53))
       (expect (docker-compose--find-context) :to-equal '("services" "web")))
     (with-temp-buffer
-      (insert "version: 2\nservices:\n  consumer:\n    build: .\n\n  web:\n    image: foo\n    env")
-      (goto-char 77)
-      (expect (docker-compose--prefix) :to-equal '("env" 74 77))
+      (insert "version: '2'\nservices:\n  consumer:\n    build: .\n\n  web:\n    image: foo\n    env")
+      (goto-char 79)
+      (expect (docker-compose--prefix) :to-equal '("env" 76 79))
       (expect (docker-compose--find-context) :to-equal '("services" "web")))
     (with-temp-buffer
-      (insert "version: 2\nservices:\n  consumer:\n    build: .\n\n  web:\n    image: foo\n")
-      (goto-char 70)
+      (insert "version: '2'\nservices:\n  consumer:\n    build: .\n\n  web:\n    image: foo\n")
+      (goto-char 72)
       (expect (docker-compose--prefix) :to-equal nil)
       (expect (docker-compose--find-context) :to-equal '()))))
 
@@ -114,11 +114,23 @@
         (insert "services:\n  foo:\n    build: .\n")
         (expect (docker-compose--find-version) :to-equal "1.0"))))
 
-  (describe "when the version is not surrounded by any quotes"
+  (describe "when the version is surrounded by a single quote and a double quote"
+    (it "returns nil"
+      (with-temp-buffer
+        (insert "version: '2\"\nservices:\n  foo:\n    build: .\n")
+        (expect (docker-compose--find-version) :to-equal nil))))
+
+  (describe "when the version is surrounded by a double quote and a single quote"
+    (it "returns nil"
+      (with-temp-buffer
+        (insert "version: \"2'\nservices:\n  foo:\n    build: .\n")
+        (expect (docker-compose--find-version) :to-equal nil))))
+
+  (describe "when the version is not surrounded by quotes"
     (it "returns the version specified by the `version' key"
       (with-temp-buffer
         (insert "version: 2\nservices:\n  foo:\n    build: .\n")
-        (expect (docker-compose--find-version) :to-equal "2"))))
+        (expect (docker-compose--find-version) :to-equal nil))))
 
   (describe "when the version is surrounded by single quotes"
     (it "returns the version specified by the `version' key"
@@ -136,7 +148,13 @@
     (it "returns the major and the minor"
       (with-temp-buffer
         (insert "version: \"3.3\"\nservices:\n  foo:\n    build: .\n")
-        (expect (docker-compose--find-version) :to-equal "3.3")))))
+        (expect (docker-compose--find-version) :to-equal "3.3"))))
+
+  (describe "when the version contains a major part, a minor part, and a suffix"
+    (it "returns it"
+      (with-temp-buffer
+        (insert "version: \"3.4-beta\"\nservices:\n  foo:\n    build: .\n")
+        (expect (docker-compose--find-version) :to-equal "3.4-beta")))))
 
 (provide 'test-docker-compose-mode)
 ;;; test-docker-compose-mode.el ends here
