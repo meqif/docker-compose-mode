@@ -34,6 +34,22 @@ Alternatively, if you prefer using `use-package`:
 (use-package docker-compose-mode)
 ```
 
+Functions to perform docker-compose commands are provided they are:
+```
+docker-compose-run-buffer
+docker-compose-build-buffer
+docker-compose-restart-buffer
+docker-compose-stop-buffer
+docker-compose-down-buffer
+docker-compose-pause-buffer
+docker-compose-unpause-buffer
+docker-compose-start-buffer
+```
+They can be bound to the docker key map as follows:
+```
+(define-key docker-compose-mode-map (kbd "C-c C-r") #'docker-compose-run-buffer)
+```
+
 ## Customization
 
 By default, the keyword completion function detects the docker-compose version
