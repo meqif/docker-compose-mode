@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.0.0] - 2017-09-16
+
 ### Changed
 - Fix namespace of keyword completion function (`docker-compose--keyword-complete-at-point` → `docker-compose-keyword-complete-at-point`)
 
