@@ -127,7 +127,7 @@
         (expect (docker-compose--find-version) :to-equal nil))))
 
   (describe "when the version is not surrounded by quotes"
-    (it "returns the version specified by the `version' key"
+    (it "returns nil"
       (with-temp-buffer
         (insert "version: 2\nservices:\n  foo:\n    build: .\n")
         (expect (docker-compose--find-version) :to-equal nil))))
