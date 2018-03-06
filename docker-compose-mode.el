@@ -78,10 +78,14 @@ version 1."
     version))
 
 (defun docker-compose--keywords-for-buffer ()
-  "Obtain keywords appropriate for the current buffer's docker-compose version."
+  "Obtain keywords appropriate for the current buffer's docker-compose version.
+
+If the version is not present in `docker-compose-keywords', the
+final (most recent) entry in it is used."
   (-when-let* ((version (-some-> (docker-compose--find-version)
                                  (docker-compose--normalize-version))))
-      (cdr (assoc version docker-compose-keywords))))
+      (cdr (or (assoc version docker-compose-keywords)
+               (car (last docker-compose-keywords))))))
 
 (defun docker-compose--post-completion (_string status)
   "Execute actions after completing with candidate.

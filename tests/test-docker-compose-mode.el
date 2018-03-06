@@ -56,6 +56,14 @@
           (goto-char 74)
           (expect (docker-compose--candidates "net") :to-equal nil))))
 
+    (describe "when the buffer version looks valid but is unknown"
+      (it "completes as if it was a recent version"
+        (with-temp-buffer
+          (insert "version: '9.99'\nservices:\n  consumer:\n    build: .\n\n  web:\n    image: foo\n\nnet")
+          (goto-char 76)
+          (expect (docker-compose--prefix) :to-equal '("net" 76 79))
+          (expect (docker-compose--candidates "net") :to-equal '("networks")))))
+
     (describe "when no applicable candidates are available"
       (it "returns nil"
         (spy-on 'docker-compose--keywords-for-buffer '())
