@@ -1,10 +1,10 @@
 ;;; docker-compose-mode.el --- Major mode for editing docker-compose files -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2017  Ricardo Martins
+;; Copyright (C) 2017-2018  Ricardo Martins
 
 ;; Author: Ricardo Martins
 ;; URL: https://github.com/meqif/docker-compose-mode
-;; Version: 1.0.0
+;; Version: 1.1.0
 ;; Keywords: convenience
 ;; Package-Requires: ((emacs "24.3") (dash "2.12.0") (yaml-mode "0.0.12"))
 
