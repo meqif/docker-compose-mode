@@ -157,11 +157,17 @@ variable for additional information about STRING and STATUS."
 (defun docker-compose--execute-command (command)
   "Helper that runs a single docker-compose command"
   (save-buffer)
-  (async-shell-command
-    (format "docker-compose -f \"%s\" %s"
-            (convert-standard-filename (buffer-file-name))
-            command)
-       "*docker-compose-output*"))
+
+  (compile
+   (format "docker-compose -f \"%s\" %s" (buffer-file-name) command))
+
+  (let ((bn (format "*docker-compose:%s*" command)))
+    ;; Kill the target buffer if it already exists...
+    (when (get-buffer bn)
+      (kill-buffer bn))
+    ;; ...and then rename the compliation buffer to that one
+    (with-current-buffer (get-buffer "*compilation*")
+      (rename-buffer bn))))
 
 (defun docker-compose-run-buffer ()
   "Runs the containers that are in the buffer"
