@@ -162,7 +162,7 @@ variable for additional information about STRING and STATUS."
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist
-             '("docker-compose[^/]*\\.yml\\'" . docker-compose-mode))
+             '("docker-compose[^/]*\\.ya?ml\\'" . docker-compose-mode))
 
 (provide 'docker-compose-mode)
 ;;; docker-compose-mode.el ends here
