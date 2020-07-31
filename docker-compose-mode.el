@@ -62,6 +62,16 @@
   :type '(alist :key-type string :value-type (repeat string))
   :group 'docker-compose)
 
+(defvar docker-compose-all-services-token "*all services*"
+  "Special token used to mark usage of all services when selecting
+  interactively")
+
+(defvar docker-compose-commands
+  '(build bundle config create down events exec help images kill
+    logs pause port ps pull push restart rm run scale start stop
+    top unpause up version)
+  "Commands that can be executed")
+
 (defun docker-compose--find-version ()
   "Find the version of the docker-compose file.
 It is assumed that files lacking an explicit 'version' key are
@@ -153,6 +163,106 @@ variable for additional information about STRING and STATUS."
           :exclusive 'yes
           :company-docsig #'identity
           :exit-function #'docker-compose--post-completion)))
+
+(defun docker-compose-select-command ()
+  "Interactively select a command to run"
+  (completing-read "command: " docker-compose-commands))
+
+(defun docker-compose--get-services ()
+  "Interactively select a command to run"
+  (let ((services (split-string
+                   (shell-command-to-string
+                    (format "docker-compose -f \"%s\" config --services"
+                            (buffer-file-name))))))
+    (add-to-list 'services docker-compose-all-services-token)))
+
+(defun docker-compose-select-service ()
+  "Interactively select a service"
+  (completing-read "command: " (docker-compose--get-services)))
+
+(defun docker-compose-execute-command (command &optional service)
+  "Run a single docker-compose command on one or all services
+
+If no command or service are given, prompt for them interactively."
+  (interactive
+   (list (docker-compose-select-command)
+         (docker-compose-select-service)))
+
+  (docker-compose--execute-command command service))
+
+(defun docker-compose--execute-command (command &optional service)
+  "Helper that runs a single docker-compose command"
+  (save-buffer)
+
+  ;; If there isn't already a service set, prompt for it
+  (setq service (or service (docker-compose-select-service)))
+
+  ;; Define the compilation command to run and execute it
+  (let ((target (format "docker-compose -f \"%s\" %s"
+                        (buffer-file-name)
+                        command)))
+    ;; If a service is set, we need to add it to the command
+    (when (not (string-equal service docker-compose-all-services-token))
+      (setq target (format "%s %s" target service)))
+
+    (compile target))
+
+  ;; Rename the compilation buffer so that the buffer contains the
+  ;; command and the name of the service. If projectile is available,
+  ;; the current project name is used as a prefix. If not,
+  ;; "docker-compose" is used.
+  (let* ((prefix (if (featurep 'projectile)
+                     (projectile-project-name)
+                   "docker-compose"))
+         (bn (format "*%s:%s:%s*" prefix command service)))
+    ;; Kill the target buffer if it already exists...
+    (when (get-buffer bn)
+      (kill-buffer bn))
+    ;; ...and then rename the compliation buffer to that one
+    (with-current-buffer (get-buffer "*compilation*")
+      (rename-buffer bn))))
+
+(defun docker-compose-run-buffer ()
+  "Runs the containers that are in the buffer"
+  (interactive)
+  (docker-compose--execute-command "up -d"))
+
+(defun docker-compose-build-buffer ()
+  "Builds container images for the containers listed in the buffer"
+  (interactive)
+  (docker-compose--execute-command "build"))
+
+(defun docker-compose-restart-buffer ()
+  "Restarts the containers listed in the buffer"
+  (interactive)
+  (docker-compose--execute-command "restart"))
+
+(defun docker-compose-stop-buffer ()
+  "Stops the containers in the current buffer"
+  (interactive)
+  (docker-compose--execute-command "stop"))
+
+(defun docker-compose-down-buffer ()
+  "Runs docker-compose down on the buffer"
+  (interactive)
+  (docker-compose--execute-command "down"))
+
+(defun docker-compose-pause-buffer ()
+  "Pauses the containers within the buffer"
+  (interactive)
+  (docker-compose--execute-command "pause"))
+
+(defun docker-compose-unpause-buffer ()
+  "Unpause the containers within the buffer"
+  (interactive)
+  (docker-compose--execute-command "unpause"))
+
+
+(defun docker-compose-start-buffer ()
+  "Starts the containers listed in the buffer"
+  (interactive)
+  (docker-compose--execute-command "start"))
+
 
 ;;;###autoload
 (define-derived-mode docker-compose-mode yaml-mode "docker-compose"
