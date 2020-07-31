@@ -154,6 +154,79 @@ variable for additional information about STRING and STATUS."
           :company-docsig #'identity
           :exit-function #'docker-compose--post-completion)))
 
+(defun docker-compose-run-buffer ()
+  "Runs the containers that are in the buffer"
+  (interactive)
+  (save-buffer)
+  (async-shell-command
+    (format "docker-compose -f \"%s\" up -d"
+               (standard-filename (buffer-file-name)))
+       "*dockercompose-output*"))
+
+(defun docker-compose-build-buffer ()
+  "Builds container images for the containers listed in the buffer"
+  (interactive)
+  (save-buffer)
+  (async-shell-command
+    (format "docker-compose -f \"%s\" build"
+               (standard-filename (buffer-file-name)))
+       "*dockercompose-output*"))
+
+(defun docker-compose-restart-buffer ()
+  "Restarts the containers listed in the buffer"
+  (interactive)
+  (save-buffer)
+  (async-shell-command
+    (format "docker-compose -f \"%s\" restart"
+               (standard-filename (buffer-file-name)))
+       "*dockercompose-output*"))
+
+(defun docker-compose-stop-buffer ()
+  "Stops the containers in the current buffer"
+  (interactive)
+  (save-buffer)
+  (async-shell-command
+    (format "docker-compose -f \"%s\" stop"
+               (standard-filename (buffer-file-name)))
+       "*dockercompose-output*"))
+
+(defun docker-compose-down-buffer ()
+  "Runs docker-compose down on the buffer"
+  (interactive)
+  (save-buffer)
+  (async-shell-command
+    (format "docker-compose -f \"%s\" down"
+               (standard-filename (buffer-file-name)))
+       "*dockercompose-output*"))
+
+(defun docker-compose-pause-buffer ()
+  "Pauses the containers within the buffer"
+  (interactive)
+  (save-buffer)
+  (async-shell-command
+    (format "docker-compose -f \"%s\" pause"
+               (standard-filename (buffer-file-name)))
+       "*dockercompose-output*"))
+
+(defun docker-compose-unpause-buffer ()
+  "Unpause the containers within the buffer"
+  (interactive)
+  (save-buffer)
+  (async-shell-command
+    (format "docker-compose -f \"%s\" unpause"
+               (standard-filename (buffer-file-name)))
+       "*dockercompose-output*"))
+
+
+(defun docker-compose-start-buffer ()
+  "Starts the containers listed in the buffer"
+  (interactive)
+  (save-buffer)
+  (async-shell-command
+    (format "docker-compose -f \"%s\" start"
+               (standard-filename (buffer-file-name)))
+       "*dockercompose-output*"))
+
 ;;;###autoload
 (define-derived-mode docker-compose-mode yaml-mode "docker-compose"
   "Major mode to edit docker-compose files."
