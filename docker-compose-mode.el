@@ -38,6 +38,7 @@
 
 (require 'cl-lib)
 (require 'dash)
+(require 'yaml-mode)
 
 (defgroup docker-compose nil
   "Major mode for editing docker-compose files."
