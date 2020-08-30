@@ -154,6 +154,8 @@ variable for additional information about STRING and STATUS."
           :company-docsig #'identity
           :exit-function #'docker-compose--post-completion)))
 
+(declare-function yaml-mode "ext:yaml-mode")
+
 ;;;###autoload
 (define-derived-mode docker-compose-mode yaml-mode "docker-compose"
   "Major mode to edit docker-compose files."
