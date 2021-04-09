@@ -69,7 +69,7 @@ It is assumed that files lacking an explicit 'version' key are
 version 1."
   (save-excursion
     (goto-char (point-min))
-    (if (re-search-forward "^version:\s*" (point-at-eol) t 1)
+    (if (re-search-forward "^version:\s*" nil t 1)
         (when (looking-at "\\([\"']\\)\\([0-9]\\(?:\.[0-9]+\\(?:-\\w+\\)?\\)?\\)\\1$")
           (match-string-no-properties 2))
       "1.0")))
