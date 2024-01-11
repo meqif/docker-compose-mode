@@ -163,8 +163,10 @@ variable for additional information about STRING and STATUS."
               '(docker-compose-keyword-complete-at-point)))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist
-             '("docker-compose[^/]*\\.ya?ml\\'" . docker-compose-mode))
+(setq auto-mode-alist
+      (append '(("docker-compose[^/]*\\.ya?ml\\'" . docker-compose-mode)
+                ("compose[^/]*\\.ya?ml\\'" . docker-compose-mode))
+              auto-mode-alist))
 
 (provide 'docker-compose-mode)
 ;;; docker-compose-mode.el ends here
